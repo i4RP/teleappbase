@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useAccount, useBalance, useChainId } from 'wagmi'
 import { formatUnits } from 'viem'
+import Image from 'next/image'
 
 interface Token {
   symbol: string
@@ -11,6 +12,7 @@ interface Token {
   formattedBalance: string
   decimals: number
   address?: string
+  iconPath: string
 }
 
 interface TokenListProps {
@@ -37,6 +39,11 @@ export default function TokenList({ onSelectToken }: TokenListProps) {
     token: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' as `0x${string}`,
   })
 
+  const formatEthBalance = (balance: bigint, decimals: number): string => {
+    const formatted = formatUnits(balance, 9)
+    return parseFloat(formatted).toString()
+  }
+
   useEffect(() => {
     const fetchTokens = async () => {
       if (!isConnected || !address) {
@@ -51,12 +58,15 @@ export default function TokenList({ onSelectToken }: TokenListProps) {
         const tokenList: Token[] = []
         
         if (nativeBalance) {
+          const formattedEthBalance = formatEthBalance(nativeBalance.value, nativeBalance.decimals)
+          
           tokenList.push({
             symbol: nativeBalance.symbol,
             name: nativeBalance.symbol,
             balance: nativeBalance.value.toString(),
-            formattedBalance: nativeBalance.formatted,
+            formattedBalance: formattedEthBalance,
             decimals: nativeBalance.decimals,
+            iconPath: '/images/tokens/eth.png'
           })
         }
         
@@ -68,6 +78,7 @@ export default function TokenList({ onSelectToken }: TokenListProps) {
             formattedBalance: usdtBalance.formatted,
             decimals: usdtBalance.decimals,
             address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+            iconPath: '/images/tokens/usdt.png'
           })
         }
         
@@ -79,6 +90,7 @@ export default function TokenList({ onSelectToken }: TokenListProps) {
             formattedBalance: usdcBalance.formatted,
             decimals: usdcBalance.decimals,
             address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+            iconPath: '/images/tokens/usdc.png'
           })
         }
         
@@ -116,8 +128,12 @@ export default function TokenList({ onSelectToken }: TokenListProps) {
             onClick={() => onSelectToken(token)}
           >
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-3">
-                {token.symbol.charAt(0)}
+              <div className="w-8 h-8 rounded-full flex items-center justify-center mr-3 overflow-hidden">
+                <img 
+                  src={token.iconPath} 
+                  alt={token.symbol} 
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div>
                 <div className="font-medium">{token.symbol}</div>

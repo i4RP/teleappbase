@@ -11,6 +11,7 @@ interface Token {
   formattedBalance: string
   decimals: number
   address?: string
+  iconPath?: string
 }
 
 interface SendModalProps {
@@ -82,8 +83,18 @@ export default function SendModal({ token, onClose }: SendModalProps) {
         
         <div className="mb-4">
           <div className="flex items-center mb-2">
-            <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-3">
-              {token.symbol.charAt(0)}
+            <div className="w-8 h-8 rounded-full flex items-center justify-center mr-3 overflow-hidden">
+              {token.iconPath ? (
+                <img 
+                  src={token.iconPath} 
+                  alt={token.symbol} 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                  {token.symbol.charAt(0)}
+                </div>
+              )}
             </div>
             <div>
               <div className="font-medium">{token.symbol}</div>
