@@ -27,6 +27,16 @@ export default function TokenList({ onSelectToken }: TokenListProps) {
     address,
   })
 
+  const { data: usdtBalance } = useBalance({
+    address,
+    token: '0xdAC17F958D2ee523a2206206994597C13D831ec7' as `0x${string}`,
+  })
+
+  const { data: usdcBalance } = useBalance({
+    address,
+    token: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' as `0x${string}`,
+  })
+
   useEffect(() => {
     const fetchTokens = async () => {
       if (!isConnected || !address) {
@@ -50,26 +60,27 @@ export default function TokenList({ onSelectToken }: TokenListProps) {
           })
         }
         
-        const mockTokens: Token[] = [
-          {
-            symbol: 'USDT',
+        if (usdtBalance) {
+          tokenList.push({
+            symbol: usdtBalance.symbol,
             name: 'Tether USD',
-            balance: '1000000', // 1 USDT
-            formattedBalance: '1.0',
-            decimals: 6,
+            balance: usdtBalance.value.toString(),
+            formattedBalance: usdtBalance.formatted,
+            decimals: usdtBalance.decimals,
             address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-          },
-          {
-            symbol: 'USDC',
-            name: 'USD Coin',
-            balance: '2000000', // 2 USDC
-            formattedBalance: '2.0',
-            decimals: 6,
-            address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-          }
-        ]
+          })
+        }
         
-        tokenList.push(...mockTokens)
+        if (usdcBalance) {
+          tokenList.push({
+            symbol: usdcBalance.symbol,
+            name: 'USD Coin',
+            balance: usdcBalance.value.toString(),
+            formattedBalance: usdcBalance.formatted,
+            decimals: usdcBalance.decimals,
+            address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+          })
+        }
         
         setTokens(tokenList)
       } catch (error) {
@@ -80,7 +91,7 @@ export default function TokenList({ onSelectToken }: TokenListProps) {
     }
 
     fetchTokens()
-  }, [address, isConnected, nativeBalance, chainId])
+  }, [address, isConnected, nativeBalance, usdtBalance, usdcBalance, chainId])
 
   if (!isConnected) {
     return null
