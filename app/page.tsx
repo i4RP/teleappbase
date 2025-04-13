@@ -1,4 +1,5 @@
 "use client";
+export const runtime = 'edge'
 import { useAccount } from "wagmi";
 
 export default function Home() {
@@ -19,7 +20,7 @@ export default function Home() {
           <div className="flex justify-center items-center p-4">
           <appkit-button />
           </div>
-        </div> 
+        </div>
         <br></br>
         {isConnected && (
           <div className="grid bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
