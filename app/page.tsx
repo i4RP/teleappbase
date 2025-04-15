@@ -34,7 +34,7 @@ export default function Home() {
           <div className="hidden sm:inline text-xl font-bold">Reown - AppKit EVM</div>
         </div>
       </header>
-      <h2 className="my-8 text-2xl font-bold leading-snug text-center">Examples</h2>
+      // <h2 className="my-8 text-2xl font-bold leading-snug text-center">Examples</h2>
       <div className="max-w-4xl">
         <div className="grid bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
           <h3 className="text-sm font-semibold bg-gray-100 p-2 text-center">Connect your wallet</h3>
@@ -51,7 +51,7 @@ export default function Home() {
                 <appkit-network-button />
               </div>
             </div>
-            
+
             {/* トークンリスト */}
             <div className="grid bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm mt-4">
               <h3 className="text-sm font-semibold bg-gray-100 p-2 text-center">トークン一覧</h3>
@@ -62,11 +62,14 @@ export default function Home() {
           </>
         )}
       </div>
-      
-      {/* Sendモーダル */}
+
+      {/* モーダルはページ全体の上に重なるように */}
       {selectedToken && (
-        <SendModal token={selectedToken} onClose={closeModal} />
+        <div className="fixed inset-0 z-50">
+          <SendModal token={selectedToken} onClose={closeModal} />
+        </div>
       )}
+
     </main>
   );
 }

@@ -40,9 +40,17 @@ export default function TokenList({ onSelectToken }: TokenListProps) {
   })
 
   const formatEthBalance = (balance: bigint, decimals: number): string => {
-    const formatted = formatUnits(balance, 9)
-    return parseFloat(formatted).toString()
-  }
+    const formatted = formatUnits(balance, decimals);
+    const floatVal = parseFloat(formatted);
+
+    // 指数表記が出た場合は通常表記に直して末尾ゼロを削除
+    if (floatVal.toString().includes("e")) {
+      return floatVal.toFixed(18).replace(/\.?0+$/, "");
+    }
+
+    // 通常表記なら toPrecision(8) → 末尾ゼロ除去
+    return floatVal.toPrecision(8).replace(/\.?0+$/, "");
+  };
 
   useEffect(() => {
     const fetchTokens = async () => {
@@ -54,12 +62,12 @@ export default function TokenList({ onSelectToken }: TokenListProps) {
 
       try {
         setLoading(true)
-        
+
         const tokenList: Token[] = []
-        
+
         if (nativeBalance) {
           const formattedEthBalance = formatEthBalance(nativeBalance.value, nativeBalance.decimals)
-          
+
           tokenList.push({
             symbol: nativeBalance.symbol,
             name: nativeBalance.symbol,
@@ -69,7 +77,7 @@ export default function TokenList({ onSelectToken }: TokenListProps) {
             iconPath: '/images/tokens/eth.png'
           })
         }
-        
+
         if (usdtBalance) {
           tokenList.push({
             symbol: usdtBalance.symbol,
@@ -81,7 +89,7 @@ export default function TokenList({ onSelectToken }: TokenListProps) {
             iconPath: '/images/tokens/usdt.png'
           })
         }
-        
+
         if (usdcBalance) {
           tokenList.push({
             symbol: usdcBalance.symbol,
@@ -93,7 +101,7 @@ export default function TokenList({ onSelectToken }: TokenListProps) {
             iconPath: '/images/tokens/usdc.png'
           })
         }
-        
+
         setTokens(tokenList)
       } catch (error) {
         console.error('Failed to fetch tokens:', error)
@@ -129,9 +137,9 @@ export default function TokenList({ onSelectToken }: TokenListProps) {
           >
             <div className="flex items-center">
               <div className="w-8 h-8 rounded-full flex items-center justify-center mr-3 overflow-hidden">
-                <img 
-                  src={token.iconPath} 
-                  alt={token.symbol} 
+                <img
+                  src={token.iconPath}
+                  alt={token.symbol}
                   className="w-full h-full object-cover"
                 />
               </div>
