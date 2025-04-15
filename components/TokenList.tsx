@@ -42,13 +42,9 @@ export default function TokenList({ onSelectToken }: TokenListProps) {
   const formatEthBalance = (balance: bigint, decimals: number): string => {
     const formatted = formatUnits(balance, decimals);
     const floatVal = parseFloat(formatted);
-
-    // 指数表記が出た場合は通常表記に直して末尾ゼロを削除
     if (floatVal.toString().includes("e")) {
       return floatVal.toFixed(18).replace(/\.?0+$/, "");
     }
-
-    // 通常表記なら toPrecision(8) → 末尾ゼロ除去
     return floatVal.toPrecision(8).replace(/\.?0+$/, "");
   };
 
