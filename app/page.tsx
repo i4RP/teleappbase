@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import TokenList from "@/components/TokenList";
 import SendModal from "@/components/SendModal";
+import Image from "next/image";
 
 interface Token {
   symbol: string;
@@ -44,7 +45,13 @@ export default function Home() {
       {/* ヘッダー */}
       <header className="w-full py-4 flex justify-between items-center">
         <div className="flex items-center">
-          <img src="/reown-logo.png" alt="logo" className="w-35 h-10 mr-2" />
+        <Image
+          src="/reown-logo.png"
+          alt="logo"
+          width={140}
+          height={40}
+          className="mr-2"
+        />
           <div className="hidden sm:inline text-xl font-bold">Reown - AppKit EVM</div>
         </div>
       </header>

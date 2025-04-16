@@ -53,6 +53,7 @@ export default function SendModal({ token, onClose }: SendModalProps) {
           value,
         })
       } else {
+
         // ERC-20送信
         await writeContractAsync({
           address: token.address as `0x${string}`,
@@ -63,15 +64,15 @@ export default function SendModal({ token, onClose }: SendModalProps) {
               stateMutability: 'nonpayable',
               inputs: [
                 { name: 'to', type: 'address' },
-                { name: 'value', type: 'uint256' },
+                { name: 'value', type: 'uint256' }
               ],
-              outputs: [{ name: '', type: 'bool' }],
-            },
+              outputs: [{ name: '', type: 'bool' }]
+            }
           ],
           functionName: 'transfer',
-          args: [ethAddress, value],
+          args: [ethAddress as `0x${string}`, value], 
         })
-      }
+
 
       setIsSuccess(true)
     } catch (error: any) {

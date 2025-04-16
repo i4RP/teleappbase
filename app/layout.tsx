@@ -10,8 +10,8 @@ import { headers } from "next/headers"; // added
 import ContextProvider from '@/context'
 
 export const metadata: Metadata = {
-  title: "AppKit Example App",
-  description: "Powered by Reown"
+  title: "3tx",
+  description: "TX"
 };
 
 export default function RootLayout({
