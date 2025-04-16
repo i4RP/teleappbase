@@ -133,11 +133,13 @@ export default function TokenList({ onSelectToken }: TokenListProps) {
           >
             <div className="flex items-center">
               <div className="w-8 h-8 rounded-full flex items-center justify-center mr-3 overflow-hidden">
-                <img
-                  src={token.iconPath}
-                  alt={token.symbol}
-                  className="w-full h-full object-cover"
-                />
+              <Image
+                src={token.iconPath}
+                alt={token.symbol}
+                width={32} // 必須指定（数字は表示サイズに合わせて調整可能）
+                height={32}
+                className="w-full h-full object-cover"
+              />
               </div>
               <div>
                 <div className="font-medium">{token.symbol}</div>

@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { useAccount, useSendTransaction, useWriteContract } from 'wagmi'
 import { parseUnits } from 'viem'
+import Image from 'next/image' // ✅ 追加
 
 interface Token {
   symbol: string
@@ -46,13 +47,11 @@ export default function SendModal({ token, onClose }: SendModalProps) {
       const value = parseUnits(amount, token.decimals)
 
       if (token.symbol.toLowerCase() === 'eth' || !token.address) {
-        // ETH送信
         await sendTransaction({
           to: ethAddress as `0x${string}`,
           value,
         })
       } else {
-        // ERC-20送信
         await writeContractAsync({
           address: token.address as `0x${string}`,
           abi: [
@@ -72,7 +71,7 @@ export default function SendModal({ token, onClose }: SendModalProps) {
         })
       }
 
-      setIsSuccess(true); // ← セミコロン追加！
+      setIsSuccess(true);
     } catch (error: any) {
       setError(error.message || '送信に失敗しました')
     } finally {
@@ -94,7 +93,13 @@ export default function SendModal({ token, onClose }: SendModalProps) {
           <div className="flex items-center mb-2">
             <div className="w-8 h-8 rounded-full flex items-center justify-center mr-3 overflow-hidden">
               {token.iconPath ? (
-                <img src={token.iconPath} alt={token.symbol} className="w-full h-full object-cover" />
+                <Image
+                  src={token.iconPath}
+                  alt={token.symbol}
+                  width={32}
+                  height={32}
+                  className="w-full h-full object-cover"
+                />
               ) : (
                 <div className="w-full h-full bg-gray-200 flex items-center justify-center">
                   {token.symbol.charAt(0)}
