@@ -24,7 +24,6 @@ export default function SendModal({ token, onClose }: SendModalProps) {
   const [recipient, setRecipient] = useState('')
   const [amount, setAmount] = useState('')
   const [error, setError] = useState('')
-
   const [isPending, setIsPending] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
 
@@ -53,7 +52,6 @@ export default function SendModal({ token, onClose }: SendModalProps) {
           value,
         })
       } else {
-
         // ERC-20送信
         await writeContractAsync({
           address: token.address as `0x${string}`,
@@ -70,11 +68,11 @@ export default function SendModal({ token, onClose }: SendModalProps) {
             }
           ],
           functionName: 'transfer',
-          args: [ethAddress as `0x${string}`, value], 
+          args: [ethAddress as `0x${string}`, value],
         })
+      }
 
-
-      setIsSuccess(true)
+      setIsSuccess(true); // ← セミコロン追加！
     } catch (error: any) {
       setError(error.message || '送信に失敗しました')
     } finally {
