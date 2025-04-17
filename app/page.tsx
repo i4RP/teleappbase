@@ -42,20 +42,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen px-8 py-0 pb-12 flex-1 flex flex-col items-center">
-      {/* ヘッダー */}
-      <header className="w-full py-4 flex justify-between items-center">
-        <div className="flex items-center">
-        <Image
-          src="/reown-logo.png"
-          alt="logo"
-          width={140}
-          height={40}
-          className="mr-2"
-        />
-          <div className="hidden sm:inline text-xl font-bold">Reown - AppKit EVM</div>
-        </div>
-      </header>
-
       <div className="max-w-4xl w-full">
         {/* ウォレット接続 */}
         <div className="grid bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
