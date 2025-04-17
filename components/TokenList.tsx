@@ -17,13 +17,15 @@ interface Token {
 
 interface TokenListProps {
   onSelectToken: (token: Token) => void
+  onUpdateTotalBalance?: (total: string) => void
 }
 
-export default function TokenList({ onSelectToken }: TokenListProps) {
+export default function TokenList({ onSelectToken, onUpdateTotalBalance }: TokenListProps) {
   const { address, isConnected } = useAccount()
   const chainId = useChainId()
   const [tokens, setTokens] = useState<Token[]>([])
   const [loading, setLoading] = useState(true)
+  const [totalBalanceUSD, setTotalBalanceUSD] = useState<string>("0.00")
 
   const { data: nativeBalance } = useBalance({
     address,
@@ -48,10 +50,29 @@ export default function TokenList({ onSelectToken }: TokenListProps) {
     return floatVal.toPrecision(8).replace(/\.?0+$/, "");
   };
 
+  const ETH_PRICE_USD = 3500;
+
+  const calculateTotalBalanceUSD = (tokenList: Token[]): string => {
+    let total = 0;
+
+    tokenList.forEach(token => {
+      if (token.symbol === 'ETH') {
+        const ethValue = parseFloat(token.formattedBalance) * ETH_PRICE_USD;
+        total += ethValue;
+      } else if (token.symbol === 'USDT' || token.symbol === 'USDC') {
+        total += parseFloat(token.formattedBalance);
+      }
+    });
+
+    return total.toFixed(2);
+  };
+
   useEffect(() => {
     const fetchTokens = async () => {
       if (!isConnected || !address) {
         setTokens([])
+        setTotalBalanceUSD("0.00")
+        if (onUpdateTotalBalance) onUpdateTotalBalance("0.00")
         setLoading(false)
         return
       }
@@ -99,6 +120,10 @@ export default function TokenList({ onSelectToken }: TokenListProps) {
         }
 
         setTokens(tokenList)
+        
+        const totalUSD = calculateTotalBalanceUSD(tokenList);
+        setTotalBalanceUSD(totalUSD);
+        if (onUpdateTotalBalance) onUpdateTotalBalance(totalUSD);
       } catch (error) {
         console.error('Failed to fetch tokens:', error)
       } finally {
@@ -107,7 +132,7 @@ export default function TokenList({ onSelectToken }: TokenListProps) {
     }
 
     fetchTokens()
-  }, [address, isConnected, nativeBalance, usdtBalance, usdcBalance, chainId])
+  }, [address, isConnected, nativeBalance, usdtBalance, usdcBalance, chainId, onUpdateTotalBalance])
 
   if (!isConnected) {
     return null
@@ -122,24 +147,24 @@ export default function TokenList({ onSelectToken }: TokenListProps) {
   }
 
   return (
-    <div className="mt-6">
+    <div className="p-4">
       <h2 className="text-xl font-bold mb-4">保有トークン</h2>
-      <div className="space-y-2">
+      <div className="space-y-3">
         {tokens.map((token, index) => (
           <div
             key={index}
-            className="p-4 border rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-50"
+            className="p-4 bg-white border border-gray-100 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-50 shadow-sm"
             onClick={() => onSelectToken(token)}
           >
             <div className="flex items-center">
               <div className="w-8 h-8 rounded-full flex items-center justify-center mr-3 overflow-hidden">
-              <Image
-                src={token.iconPath}
-                alt={token.symbol}
-                width={32} // 必須指定（数字は表示サイズに合わせて調整可能）
-                height={32}
-                className="w-full h-full object-cover"
-              />
+                <Image
+                  src={token.iconPath}
+                  alt={token.symbol}
+                  width={32}
+                  height={32}
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div>
                 <div className="font-medium">{token.symbol}</div>
