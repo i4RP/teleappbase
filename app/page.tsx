@@ -101,10 +101,24 @@ export default function Home() {
             {/* ネットワークとアドレス表示 */}
             <div className="flex justify-between mb-4 gap-2">
               <div className="flex-1 bg-white rounded-lg p-3 shadow-sm flex items-center justify-center">
-                <appkit-network-button />
+                <div className="flex items-center">
+                  <Image
+                    src="/images/tokens/eth.png"
+                    alt="Ethereum"
+                    width={24}
+                    height={24}
+                    className="mr-2"
+                  />
+                  <span>Ethereum</span>
+                </div>
               </div>
               <div className="flex-1 bg-white rounded-lg p-3 shadow-sm flex items-center justify-center">
-                <appkit-button />
+                <div className="flex items-center">
+                  <div className="w-6 h-6 rounded-full bg-teal-100 flex items-center justify-center mr-2">
+                    <span className="text-xs text-teal-500">👤</span>
+                  </div>
+                  <span className="text-sm truncate">{address ? `${address.slice(0, 6)}...${address.slice(-4)}` : ''}</span>
+                </div>
               </div>
             </div>
 
