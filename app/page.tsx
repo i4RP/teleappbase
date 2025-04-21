@@ -56,15 +56,16 @@ export default function Home() {
   return (
     <main className="min-h-screen px-4 py-0 pb-12 flex-1 flex flex-col items-center bg-gray-100">
       <div className="max-w-md w-full">
-        {/* ウォレット接続 */}
-        {!isConnected ? (
-          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm mt-4">
-            <h3 className="text-sm font-semibold bg-gray-100 p-2 text-center">Connect your wallet</h3>
-            <div className="flex justify-center items-center p-4">
-              <appkit-button />
-            </div>
+        {/* ウォレット接続 - 常に表示 */}
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm mt-4">
+          <h3 className="text-sm font-semibold bg-gray-100 p-2 text-center">Connect your wallet</h3>
+          <div className="flex justify-center items-center p-4">
+            <appkit-button />
           </div>
-        ) : (
+        </div>
+        
+        {/* ログイン後のコンテンツ */}
+        {isConnected && (
           <>
             {/* タブUI */}
             <div className="mt-4 mb-4">
