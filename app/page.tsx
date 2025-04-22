@@ -2,10 +2,11 @@
 export const runtime = 'edge'
 
 import { useState, useEffect } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import TokenList from "@/components/TokenList";
 import SendModal from "@/components/SendModal";
 import Image from "next/image";
+import { sepolia } from "viem/chains";
 
 interface Token {
   symbol: string;
@@ -21,6 +22,8 @@ type TabType = 'wallet' | 'gameToken';
 
 export default function Home() {
   const { isConnected, address } = useAccount();
+  const chainId = useChainId();
+  const { switchChain } = useSwitchChain();
   const [selectedToken, setSelectedToken] = useState<Token | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('wallet');
   const [totalWalletBalance, setTotalWalletBalance] = useState<string>("0.00");
@@ -53,6 +56,12 @@ export default function Home() {
     };
   }, [selectedToken]);
 
+  useEffect(() => {
+    if (activeTab === 'gameToken' && chainId !== sepolia.id) {
+      switchChain({ chainId: sepolia.id });
+    }
+  }, [activeTab, chainId, switchChain]);
+
   return (
     <main className="min-h-screen px-4 py-0 pb-12 flex-1 flex flex-col items-center bg-gray-100">
       <div className="max-w-md w-full">
@@ -63,6 +72,7 @@ export default function Home() {
             <div className="flex justify-center items-center p-4">
               <appkit-button />
             </div>
+            <div className="text-center text-xs text-gray-500 pb-2">#16</div>
           </div>
         ) : (
           <>
@@ -109,7 +119,7 @@ export default function Home() {
                     height={24}
                     className="mr-2"
                   />
-                  <span>Ethereum</span>
+                  <span>{chainId === sepolia.id ? 'Sepolia' : 'Ethereum'}</span>
                 </div>
               </div>
               <div className="flex-1 bg-white rounded-lg p-3 shadow-sm flex items-center justify-center">
