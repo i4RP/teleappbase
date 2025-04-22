@@ -72,7 +72,7 @@ export default function Home() {
             <div className="flex justify-center items-center p-4">
               <appkit-button />
             </div>
-            <div className="text-center text-xs text-gray-500 pb-2">Version 0.1.0</div>
+            <div className="text-center text-xs text-gray-500 pb-2">#16</div>
           </div>
         ) : (
           <>
