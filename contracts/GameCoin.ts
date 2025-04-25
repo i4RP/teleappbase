@@ -1,7 +1,7 @@
-import { Address, createPublicClient, http } from 'viem';
+import { Address } from 'viem';
 import { sepolia } from 'viem/chains';
 
-const gameCoinABI = [
+export const gameCoinABI = [
   {
     inputs: [{ name: '', type: 'address' }],
     name: 'gameCoinBalance',
@@ -12,27 +12,6 @@ const gameCoinABI = [
 ] as const;
 
 export const GAME_COIN_ADDRESS = '0x359394D70Ca0565C9F5e85D9182ae62D4bcfE745';
-
-const publicClient = createPublicClient({
-  chain: sepolia,
-  transport: http(),
-});
-
-export async function getGameCoinBalance(userAddress: Address): Promise<bigint> {
-  try {
-    const balance = await publicClient.readContract({
-      address: GAME_COIN_ADDRESS,
-      abi: gameCoinABI,
-      functionName: 'gameCoinBalance',
-      args: [userAddress],
-    });
-    
-    return balance;
-  } catch (error) {
-    console.error('Failed to fetch GameCoin balance:', error);
-    return BigInt(0);
-  }
-}
 
 export function formatGameCoinBalance(balance: bigint): string {
   const decimals = 6; // USDTと同じ小数点以下の桁数を想定
