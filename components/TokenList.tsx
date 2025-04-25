@@ -5,7 +5,7 @@ import { useAccount, useBalance, useChainId } from 'wagmi'
 import { formatUnits } from 'viem'
 import { sepolia } from 'viem/chains'
 import Image from 'next/image'
-import { SEPOLIA_USDT_ADDRESS } from '@/config'
+import { MAINNET_USDT_ADDRESS, MAINNET_USDC_ADDRESS, SEPOLIA_USDT_ADDRESS } from '@/constants/tokens'
 
 interface Token {
   symbol: string
@@ -30,11 +30,9 @@ export default function TokenList({ onSelectToken, onUpdateTotalBalance }: Token
   const [totalBalanceUSD, setTotalBalanceUSD] = useState<string>("0.00")
   const isSepoliaNetwork = chainId === sepolia.id
 
-  const mainnetUsdtAddress = '0xdAC17F958D2ee523a2206206994597C13D831ec7'
-
-  const mainnetUsdcAddress = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
-
-  const sepoliaUsdtAddress = SEPOLIA_USDT_ADDRESS || '0xAA26ff5dd04368916806d3cBf985fF41e023BF48'
+  const mainnetUsdtAddress = MAINNET_USDT_ADDRESS
+  const mainnetUsdcAddress = MAINNET_USDC_ADDRESS
+  const sepoliaUsdtAddress = SEPOLIA_USDT_ADDRESS
 
   const { data: nativeBalance } = useBalance({
     address,
