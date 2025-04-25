@@ -10,7 +10,7 @@ if (!projectId) {
   throw new Error('Project ID is not defined')
 }
 
-export const networks = [mainnet, sepolia, arbitrum, scroll, morph, berachainTestnetbArtio, mantle, soneium, zircuit, rootstock, abstract, viction, monadTestnet, celo, apeChain]
+export const networks = [sepolia, mainnet, arbitrum, scroll, morph, berachainTestnetbArtio, mantle, soneium, zircuit, rootstock, abstract, viction, monadTestnet, celo, apeChain]
 
 const combinedStorage = createStorage({
   storage: {
@@ -37,6 +37,10 @@ const combinedStorage = createStorage({
     },
   },
 })
+
+export const SEPOLIA_RPC_URL = 'https://rpc2.sepolia.org'
+export const SEPOLIA_CHAIN_ID = 11155111
+export const SEPOLIA_USDT_ADDRESS = '0xAA26ff5dd04368916806d3cBf985fF41e023BF48'
 
 //Set up the Wagmi Adapter (Config)
 export const wagmiAdapter = new WagmiAdapter({

@@ -53,11 +53,17 @@ export default function Home() {
   useEffect(() => {
     if (isConnected && address) {
       console.log("ウォレット接続済み:", address);
+      
+      if (chainId !== sepolia.id) {
+        console.log("Sepoliaネットワークに自動接続します");
+        switchChain({ chainId: sepolia.id });
+      }
+      
       setIsInitialized(true);
     } else {
       setIsInitialized(true);
     }
-  }, [isConnected, address]);
+  }, [isConnected, address, chainId, switchChain]);
 
   // モーダル表示中にスクロールを防ぐ
   useEffect(() => {
@@ -151,6 +157,27 @@ export default function Home() {
               </p>
             </div>
 
+            {/* ネットワーク切り替えセクション */}
+            <div className="bg-white rounded-lg p-4 shadow-sm mb-4">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-medium">現在のネットワーク:</span>
+                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                  {chainId === sepolia.id ? 'Sepolia' : 'Ethereum'}
+                </span>
+              </div>
+              <button
+                onClick={() => switchChain({ chainId: sepolia.id })}
+                disabled={chainId === sepolia.id}
+                className={`w-full py-2 px-4 rounded-lg text-center font-medium ${
+                  chainId === sepolia.id
+                    ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                    : 'bg-blue-500 hover:bg-blue-600 text-white'
+                }`}
+              >
+                {chainId === sepolia.id ? 'Sepolia接続中' : 'Sepoliaに切り替える'}
+              </button>
+            </div>
+            
             {/* ネットワークとアドレス表示 */}
             <div className="flex justify-between mb-4 gap-2">
               <div className="flex-1 bg-white rounded-lg p-3 shadow-sm flex items-center justify-center">
