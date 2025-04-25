@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useAccount, useChainId, useSwitchChain, useContractRead } from "wagmi";
 import TokenList from "@/components/TokenList";
 import SendModal from "@/components/SendModal";
+import TestnetTokenList from "@/components/TestnetTokenList";
 import Image from "next/image";
 import { sepolia } from "viem/chains";
 import { GAME_COIN_ADDRESS, gameCoinABI, formatGameCoinBalance } from "@/contracts/GameCoin";
@@ -30,7 +31,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>('wallet');
   const [totalWalletBalance, setTotalWalletBalance] = useState<string>("0.00");
   const [gameCoinBalance, setGameCoinBalance] = useState<string>("0.00");
-  const [prNumber, setPrNumber] = useState<string>("18"); // 現在のPR番号
+  const [prNumber, setPrNumber] = useState<string>("20"); // 現在のPR番号
 
   const handleSelectToken = (token: Token) => {
     setSelectedToken(token);
@@ -158,6 +159,10 @@ export default function Home() {
             {activeTab === 'wallet' ? (
               <div className="bg-white rounded-lg shadow-sm overflow-hidden">
                 <TokenList onSelectToken={handleSelectToken} onUpdateTotalBalance={updateTotalBalance} />
+                {/* Testnet Token List */}
+                <div className="border-t border-gray-200 mt-4 pt-4">
+                  <TestnetTokenList />
+                </div>
               </div>
             ) : (
               <div className="bg-white rounded-lg shadow-sm p-4">
