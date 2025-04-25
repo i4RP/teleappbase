@@ -2,12 +2,12 @@
 export const runtime = 'edge'
 
 import { useState, useEffect } from "react";
-import { useAccount, useChainId, useSwitchChain } from "wagmi";
+import { useAccount, useChainId, useSwitchChain, useContractRead } from "wagmi";
 import TokenList from "@/components/TokenList";
 import SendModal from "@/components/SendModal";
 import Image from "next/image";
 import { sepolia } from "viem/chains";
-import { getGameCoinBalance, formatGameCoinBalance } from "@/contracts/GameCoin";
+import { GAME_COIN_ADDRESS, gameCoinABI, formatGameCoinBalance } from "@/contracts/GameCoin";
 import { Address } from "viem";
 
 interface Token {
@@ -60,22 +60,23 @@ export default function Home() {
     };
   }, [selectedToken]);
 
+  const { data: gameCoinBalanceData } = useContractRead({
+    address: GAME_COIN_ADDRESS,
+    abi: gameCoinABI,
+    functionName: 'gameCoinBalance',
+    args: address ? [address as Address] : undefined,
+    chainId: sepolia.id,
+    query: {
+      enabled: isConnected && !!address && chainId === sepolia.id && activeTab === 'gameToken',
+    },
+  });
+
   useEffect(() => {
-    async function fetchGameCoinBalance() {
-      if (isConnected && address && chainId === sepolia.id && activeTab === 'gameToken') {
-        try {
-          const balance = await getGameCoinBalance(address as Address);
-          const formatted = formatGameCoinBalance(balance);
-          setGameCoinBalance(formatted);
-        } catch (error) {
-          console.error('Failed to fetch GameCoin balance:', error);
-          setGameCoinBalance('0.00');
-        }
-      }
+    if (gameCoinBalanceData !== undefined) {
+      const formatted = formatGameCoinBalance(gameCoinBalanceData);
+      setGameCoinBalance(formatted);
     }
-    
-    fetchGameCoinBalance();
-  }, [isConnected, address, chainId, activeTab]);
+  }, [gameCoinBalanceData]);
 
   useEffect(() => {
     if (activeTab === 'gameToken' && chainId !== sepolia.id) {
