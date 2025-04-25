@@ -32,6 +32,7 @@ export default function Home() {
   const [totalWalletBalance, setTotalWalletBalance] = useState<string>("0.00");
   const [gameCoinBalance, setGameCoinBalance] = useState<string>("0.00");
   const [prNumber, setPrNumber] = useState<string>("18"); // 現在のPR番号
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
   const handleSelectToken = (token: Token) => {
     setSelectedToken(token);
@@ -48,6 +49,15 @@ export default function Home() {
   const updateTotalBalance = (total: string) => {
     setTotalWalletBalance(total);
   };
+
+  useEffect(() => {
+    if (isConnected && address) {
+      console.log("ウォレット接続済み:", address);
+      setIsInitialized(true);
+    } else {
+      setIsInitialized(true);
+    }
+  }, [isConnected, address]);
 
   // モーダル表示中にスクロールを防ぐ
   useEffect(() => {
@@ -84,6 +94,16 @@ export default function Home() {
       switchChain({ chainId: sepolia.id });
     }
   }, [activeTab, chainId, switchChain]);
+
+  if (!isInitialized) {
+    return (
+      <main className="min-h-screen px-4 py-0 pb-12 flex-1 flex flex-col items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <p className="text-lg">ウォレット接続状態を確認中...</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen px-4 py-0 pb-12 flex-1 flex flex-col items-center bg-gray-100">
