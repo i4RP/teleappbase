@@ -139,18 +139,44 @@ export default function Home() {
               </div>
             ) : (
               <div className="bg-white rounded-lg shadow-sm p-4">
-                <h2 className="text-xl font-bold mb-4">Game Tokens</h2>
-                <div className="grid grid-cols-2 gap-4">
-                  {/* NFTのプレースホルダー */}
-                  {[1, 2, 3, 4].map((item) => (
-                    <div key={item} className="aspect-square bg-gray-200 rounded-lg flex items-center justify-center">
-                      <p className="text-gray-500">NFT {item}</p>
+                {chainId === sepolia.id ? (
+                  <>
+                    <div className="mb-4 p-3 bg-green-100 text-green-800 rounded-lg flex items-center">
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                      <span>Sepoliaネットワークに接続されています</span>
                     </div>
-                  ))}
-                </div>
-                <p className="text-center text-gray-500 mt-4">
-                  NFTデータは後ほど実装予定
-                </p>
+                    <h2 className="text-xl font-bold mb-4">Game Tokens</h2>
+                    <div className="grid grid-cols-2 gap-4">
+                      {/* NFTのプレースホルダー */}
+                      {[1, 2, 3, 4].map((item) => (
+                        <div key={item} className="aspect-square bg-gray-200 rounded-lg flex items-center justify-center">
+                          <p className="text-gray-500">NFT {item}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-center text-gray-500 mt-4">
+                      NFTデータは後ほど実装予定
+                    </p>
+                  </>
+                ) : (
+                  <div className="p-4 bg-yellow-100 text-yellow-800 rounded-lg">
+                    <div className="flex items-center mb-2">
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                      </svg>
+                      <h3 className="font-bold">ネットワークエラー</h3>
+                    </div>
+                    <p>Game TokenはSepoliaテストネットでのみ利用可能です。ネットワークをSepoliaに切り替えてください。</p>
+                    <button 
+                      onClick={() => switchChain({ chainId: sepolia.id })}
+                      className="mt-3 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg font-medium"
+                    >
+                      Sepoliaに切り替える
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </>
