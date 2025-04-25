@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useAccount, useChainId, useSwitchChain, useContractRead } from "wagmi";
 import TokenList from "@/components/TokenList";
 import SendModal from "@/components/SendModal";
+import GameCoinActions from "../components/GameCoinActions";
 import Image from "next/image";
 import { sepolia } from "viem/chains";
 import { GAME_COIN_ADDRESS, gameCoinABI, formatGameCoinBalance } from "@/contracts/GameCoin";
