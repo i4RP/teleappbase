@@ -9,7 +9,7 @@ export default function GameCoinActions() {
   const [successMessage, setSuccessMessage] = useState('');
   
   const { depositAndApproveUSDT, isPending: isDepositPending, isSuccess: isDepositSuccess } = useDepositAndApproveUSDT();
-  const { useGameCoin, isPending: isUsePending, isSuccess: isUseSuccess } = useUseGameCoin();
+  const { useGameCoin: executeGameCoin, isPending: isUsePending, isSuccess: isUseSuccess } = useUseGameCoin();
 
   const handleDeposit = async () => {
     try {
@@ -26,7 +26,7 @@ export default function GameCoinActions() {
     try {
       setError('');
       setSuccessMessage('');
-      await useGameCoin(BigInt(amount));
+      await executeGameCoin(BigInt(amount));
       setSuccessMessage('GameCoinの使用に成功しました！');
     } catch (err: any) {
       setError(err.message || 'GameCoinの使用に失敗しました');
