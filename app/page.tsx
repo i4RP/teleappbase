@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useAccount, useChainId, useSwitchChain, useContractRead } from "wagmi";
 import TokenList from "@/components/TokenList";
 import SendModal from "@/components/SendModal";
+import GameCoinActions from "@/components/GameCoinActions";
 import Image from "next/image";
 import { sepolia } from "viem/chains";
 import { GAME_COIN_ADDRESS, gameCoinABI, formatGameCoinBalance } from "@/contracts/GameCoin";
@@ -176,6 +177,12 @@ export default function Home() {
                       <span>GameCoin残高: {gameCoinBalance} BCM</span>
                     </div>
                     <h2 className="text-xl font-bold mb-4">Game Tokens</h2>
+                    
+                    {/* GameCoin操作UI */}
+                    <div className="mb-6">
+                      <GameCoinActions />
+                    </div>
+                    
                     <div className="grid grid-cols-2 gap-4">
                       {/* NFTのプレースホルダー */}
                       {[1, 2, 3, 4].map((item) => (
