@@ -6,8 +6,7 @@ const nextConfig = {
   },
   // Cloudflare Pages specific configuration
   experimental: {
-    runtime: 'edge',
-    serverComponents: true,
+    isrMemoryCacheSize: 0, // Disable ISR cache for Cloudflare
   },
   // Ensure compatibility with Cloudflare Pages
   swcMinify: true,
