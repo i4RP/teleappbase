@@ -23,6 +23,13 @@ interface Token {
 
 type TabType = 'wallet' | 'gameToken';
 
+// Helper to detect if running in Telegram environment
+const isTelegramWebApp = () => {
+  return typeof window !== 'undefined' &&
+         window.Telegram &&
+         window.Telegram.WebApp;
+};
+
 export default function Home() {
   const { isConnected, address } = useAccount();
   const chainId = useChainId();
@@ -33,6 +40,13 @@ export default function Home() {
   const [gameCoinBalance, setGameCoinBalance] = useState<string>("0.00");
   const [prNumber, setPrNumber] = useState<string>("18"); // 現在のPR番号
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
+  const [isTelegram, setIsTelegram] = useState<boolean>(false);
+
+  // Check if running in Telegram environment
+  useEffect(() => {
+    setIsTelegram(isTelegramWebApp());
+    setIsInitialized(true);
+  }, []);
 
   const handleSelectToken = (token: Token) => {
     setSelectedToken(token);
@@ -53,8 +67,6 @@ export default function Home() {
   useEffect(() => {
     if (isConnected && address) {
       console.log("ウォレット接続済み:", address);
-      setIsInitialized(true);
-    } else {
       setIsInitialized(true);
     }
   }, [isConnected, address]);
@@ -89,11 +101,15 @@ export default function Home() {
     }
   }, [gameCoinBalanceData]);
 
+  // Modified chain switching logic to avoid interference with wallet connection in Telegram
   useEffect(() => {
-    if (activeTab === 'gameToken' && chainId !== sepolia.id) {
+    // Only attempt to switch chains if:
+    // 1. Not in Telegram OR
+    // 2. In Telegram but already connected
+    if (activeTab === 'gameToken' && chainId !== sepolia.id && (!isTelegram || (isTelegram && isConnected))) {
       switchChain({ chainId: sepolia.id });
     }
-  }, [activeTab, chainId, switchChain]);
+  }, [activeTab, chainId, switchChain, isConnected, isTelegram]);
 
   if (!isInitialized) {
     return (
@@ -108,7 +124,7 @@ export default function Home() {
   return (
     <main className="min-h-screen px-4 py-0 pb-12 flex-1 flex flex-col items-center bg-gray-100">
       <div className="max-w-md w-full">
-        {/* ウォレット接続  */}
+        {/* ウォレット接続 */}
         {!isConnected ? (
           <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm mt-4">
             <h3 className="text-sm font-semibold bg-gray-100 p-2 text-center">Connect your wallet</h3>
@@ -218,7 +234,7 @@ export default function Home() {
                       <h3 className="font-bold">ネットワークエラー</h3>
                     </div>
                     <p>Game TokenはSepoliaテストネットでのみ利用可能です。ネットワークをSepoliaに切り替えてください。</p>
-                    <button 
+                    <button
                       onClick={() => switchChain({ chainId: sepolia.id })}
                       className="mt-3 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg font-medium"
                     >
