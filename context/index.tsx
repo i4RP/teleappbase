@@ -2,7 +2,7 @@
 
 import { wagmiAdapter, projectId } from '@/config'
 import { createAppKit } from '@reown/appkit/react' 
-import { mainnet, arbitrum, scroll, morph, berachainTestnetbArtio, mantle, soneium, zircuit, rootstock, abstract, viction, monadTestnet, celo, apeChain} from '@reown/appkit/networks'
+import { mainnet, arbitrum, scroll, morph, berachainTestnetbArtio, mantle, soneium, zircuit, rootstock, abstract, viction, monadTestnet, celo, apeChain, sepolia} from '@reown/appkit/networks'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import React, { type ReactNode, useEffect } from 'react'
@@ -51,10 +51,11 @@ const modal = createAppKit({
     48900: '/zircuit.svg',
     11_124: '/abstract.png',
     30: '/rootstock.png',
+    11155111: '/images/tokens/eth.png', // Sepolia
   },
   projectId,
-  networks: [mainnet, arbitrum, scroll, morph, berachainTestnetbArtio, mantle, soneium, zircuit, rootstock, abstract, viction, monadTestnet, celo, apeChain],
-  defaultNetwork: mainnet,
+  networks: [sepolia, mainnet, arbitrum, scroll, morph, berachainTestnetbArtio, mantle, soneium, zircuit, rootstock, abstract, viction, monadTestnet, celo, apeChain],
+  defaultNetwork: sepolia,
   metadata: metadata,
   features: {
     analytics: true, // Optional - defaults to your Cloud configuration
