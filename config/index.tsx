@@ -19,8 +19,7 @@ export const wagmiAdapter = new WagmiAdapter({
   }),
   ssr: true,
   networks,
-  projectId,
-  initialChainId: sepolia.id // Sepoliaをデフォルトのチェーンとして指定
+  projectId
 })
 
 export const config = wagmiAdapter.wagmiConfig
