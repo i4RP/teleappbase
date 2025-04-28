@@ -102,7 +102,6 @@ export default function Home() {
             <div className="flex justify-between mb-4 gap-2">
               <div className="flex-1 bg-white rounded-lg p-3 shadow-sm flex items-center justify-center">
                 <div className="flex items-center">
-                  <appkit-network-button />
                   <Image
                     src="/images/tokens/eth.png"
                     alt="Ethereum"
@@ -118,7 +117,6 @@ export default function Home() {
                   <div className="w-6 h-6 rounded-full bg-teal-100 flex items-center justify-center mr-2">
                     <span className="text-xs text-teal-500">👤</span>
                   </div>
-                  <appkit-button />
                   <span className="text-sm truncate">{address ? `${address.slice(0, 6)}...${address.slice(-4)}` : ''}</span>
                 </div>
               </div>
