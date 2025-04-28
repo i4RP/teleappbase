@@ -24,10 +24,12 @@ interface Token {
 type TabType = 'wallet' | 'gameToken';
 
 // Helper to detect if running in Telegram environment
-const isTelegramWebApp = () => {
-  return typeof window !== 'undefined' &&
-         window.Telegram &&
-         window.Telegram.WebApp;
+const isTelegramWebApp = (): boolean => {
+  return (
+    typeof window !== "undefined" &&
+    typeof window.Telegram !== "undefined" &&
+    typeof window.Telegram.WebApp !== "undefined"
+  );
 };
 
 export default function Home() {
@@ -35,7 +37,7 @@ export default function Home() {
   const chainId = useChainId();
   const { switchChain } = useSwitchChain();
   const [selectedToken, setSelectedToken] = useState<Token | null>(null);
-  const [activeTab, setActiveTab] = useState<TabType>('wallet');
+  const [activeTab, setActiveTab] = useState<TabType>("wallet");
   const [totalWalletBalance, setTotalWalletBalance] = useState<string>("0.00");
   const [gameCoinBalance, setGameCoinBalance] = useState<string>("0.00");
   const [prNumber, setPrNumber] = useState<string>("18"); // 現在のPR番号
