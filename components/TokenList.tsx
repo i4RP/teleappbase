@@ -3,9 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useAccount, useBalance, useChainId } from 'wagmi'
 import { formatUnits } from 'viem'
-import { sepolia } from 'viem/chains'
 import Image from 'next/image'
-import { MAINNET_USDT_ADDRESS, MAINNET_USDC_ADDRESS, SEPOLIA_USDT_ADDRESS } from '@/constants/tokens'
 
 interface Token {
   symbol: string
@@ -28,31 +26,22 @@ export default function TokenList({ onSelectToken, onUpdateTotalBalance }: Token
   const [tokens, setTokens] = useState<Token[]>([])
   const [loading, setLoading] = useState(true)
   const [totalBalanceUSD, setTotalBalanceUSD] = useState<string>("0.00")
-  const isSepoliaNetwork = chainId === sepolia.id
-
-  const mainnetUsdtAddress = MAINNET_USDT_ADDRESS
-  const mainnetUsdcAddress = MAINNET_USDC_ADDRESS
-  const sepoliaUsdtAddress = SEPOLIA_USDT_ADDRESS
 
   const { data: nativeBalance } = useBalance({
     address,
-    chainId: chainId,
   })
 
   const { data: usdtBalance } = useBalance({
     address,
-    token: isSepoliaNetwork ? sepoliaUsdtAddress as `0x${string}` : mainnetUsdtAddress as `0x${string}`,
-    chainId: chainId,
+    token: '0xdAC17F958D2ee523a2206206994597C13D831ec7' as `0x${string}`,
   })
 
   const { data: usdcBalance } = useBalance({
     address,
-    token: mainnetUsdcAddress as `0x${string}`,
-    chainId: chainId,
+    token: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' as `0x${string}`,
   })
 
   const formatEthBalance = (balance: bigint, decimals: number): string => {
-    if (!balance) return "0";
     const formatted = formatUnits(balance, decimals);
     const floatVal = parseFloat(formatted);
     if (floatVal.toString().includes("e")) {
@@ -61,13 +50,13 @@ export default function TokenList({ onSelectToken, onUpdateTotalBalance }: Token
     return floatVal.toPrecision(8).replace(/\.?0+$/, "");
   };
 
-  const ETH_PRICE_USD = 3500; // テスト環境でも同じ価格を使用
+  const ETH_PRICE_USD = 3500;
 
   const calculateTotalBalanceUSD = (tokenList: Token[]): string => {
     let total = 0;
 
     tokenList.forEach(token => {
-      if (token.symbol === 'ETH' || token.symbol === 'SepoliaETH') {
+      if (token.symbol === 'ETH') {
         const ethValue = parseFloat(token.formattedBalance) * ETH_PRICE_USD;
         total += ethValue;
       } else if (token.symbol === 'USDT' || token.symbol === 'USDC') {
@@ -95,12 +84,10 @@ export default function TokenList({ onSelectToken, onUpdateTotalBalance }: Token
 
         if (nativeBalance) {
           const formattedEthBalance = formatEthBalance(nativeBalance.value, nativeBalance.decimals)
-          const symbol = isSepoliaNetwork ? 'SepoliaETH' : nativeBalance.symbol
-          const name = isSepoliaNetwork ? 'Sepolia Ether' : 'Ethereum'
 
           tokenList.push({
-            symbol: symbol,
-            name: name,
+            symbol: nativeBalance.symbol,
+            name: nativeBalance.symbol,
             balance: nativeBalance.value.toString(),
             formattedBalance: formattedEthBalance,
             decimals: nativeBalance.decimals,
@@ -110,30 +97,30 @@ export default function TokenList({ onSelectToken, onUpdateTotalBalance }: Token
 
         if (usdtBalance) {
           tokenList.push({
-            symbol: 'USDT',
+            symbol: usdtBalance.symbol,
             name: 'Tether USD',
             balance: usdtBalance.value.toString(),
             formattedBalance: usdtBalance.formatted,
             decimals: usdtBalance.decimals,
-            address: isSepoliaNetwork ? sepoliaUsdtAddress : mainnetUsdtAddress,
+            address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
             iconPath: '/images/tokens/usdt.png'
           })
         }
 
-        if (usdcBalance && !isSepoliaNetwork) {
+        if (usdcBalance) {
           tokenList.push({
-            symbol: 'USDC',
+            symbol: usdcBalance.symbol,
             name: 'USD Coin',
             balance: usdcBalance.value.toString(),
             formattedBalance: usdcBalance.formatted,
             decimals: usdcBalance.decimals,
-            address: mainnetUsdcAddress,
+            address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
             iconPath: '/images/tokens/usdc.png'
           })
         }
 
         setTokens(tokenList)
-
+        
         const totalUSD = calculateTotalBalanceUSD(tokenList);
         setTotalBalanceUSD(totalUSD);
         if (onUpdateTotalBalance) onUpdateTotalBalance(totalUSD);
@@ -145,7 +132,7 @@ export default function TokenList({ onSelectToken, onUpdateTotalBalance }: Token
     }
 
     fetchTokens()
-  }, [address, isConnected, nativeBalance, usdtBalance, usdcBalance, chainId, onUpdateTotalBalance, isSepoliaNetwork, sepoliaUsdtAddress, mainnetUsdtAddress, mainnetUsdcAddress])
+  }, [address, isConnected, nativeBalance, usdtBalance, usdcBalance, chainId, onUpdateTotalBalance])
 
   if (!isConnected) {
     return null
