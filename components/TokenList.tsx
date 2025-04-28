@@ -31,14 +31,24 @@ export default function TokenList({ onSelectToken, onUpdateTotalBalance }: Token
     address,
   })
 
+  // const { data: usdtBalance } = useBalance({
+  //   address,
+  //   token: '0xdAC17F958D2ee523a2206206994597C13D831ec7' as `0x${string}`,
+  // })
+  // SepoliaでのUSDTのアドレス
   const { data: usdtBalance } = useBalance({
     address,
-    token: '0xdAC17F958D2ee523a2206206994597C13D831ec7' as `0x${string}`,
+    token: '0xAA26ff5dd04368916806d3cBf985fF41e023BF48' as `0x${string}`,
   })
 
+  // const { data: usdcBalance } = useBalance({
+  //   address,
+  //   token: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' as `0x${string}`,
+  // })
+  // SepoliaでのUSDCのアドレス
   const { data: usdcBalance } = useBalance({
     address,
-    token: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' as `0x${string}`,
+    token: '0x0ad45ab5f6081628b4790f4c4e5e08a7a98defec' as `0x${string}`,
   })
 
   const formatEthBalance = (balance: bigint, decimals: number): string => {
