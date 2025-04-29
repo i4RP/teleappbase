@@ -14,7 +14,7 @@ export const networks = [mainnet, arbitrum, scroll, morph, berachainTestnetbArti
 //Set up the Wagmi Adapter (Config)
 export const wagmiAdapter = new WagmiAdapter({
   storage: createStorage({
-    storage: cookieStorage
+    storage: localStorage
   }),
   ssr: true,
   networks,
