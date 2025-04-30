@@ -1,5 +1,4 @@
 "use client";
-// export const runtime = 'edge'
 
 import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
@@ -41,7 +40,6 @@ export default function Home() {
     setTotalWalletBalance(total);
   };
 
-  // モーダル表示中にスクロールを防ぐ
   useEffect(() => {
     if (selectedToken) {
       document.body.style.overflow = "hidden";
@@ -56,17 +54,18 @@ export default function Home() {
   return (
     <main className="min-h-screen px-4 py-0 pb-12 flex-1 flex flex-col items-center bg-gray-100">
       <div className="max-w-md w-full">
-        {/* ウォレット接続 */}
-        {!isConnected ? (
-          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm mt-4">
-            <h3 className="text-sm font-semibold bg-gray-100 p-2 text-center">6:Connect your wallet</h3>
-            <div className="flex justify-center items-center p-4">
-              <appkit-button />
-            </div>
-          </div>
-        ) : (
+
+        {/* 常に表示するウォレットボタン */}
+        <div className="flex flex-col items-center mt-4">
+        <appkit-button />
+        <span className="text-xs text-gray-400 mt-1">ver 7</span>
+        </div>
+
+
+        {/* ウォレット接続済みのときだけ表示 */}
+        {isConnected && (
           <>
-            {/* タブUI */}
+            {/* タブ切り替え */}
             <div className="mt-4 mb-4">
               <div className="flex rounded-lg overflow-hidden bg-gray-700">
                 <button
@@ -98,7 +97,7 @@ export default function Home() {
               </p>
             </div>
 
-            {/* ネットワークとアドレス表示 */}
+            {/* ネットワーク名・アドレス表示 */}
             <div className="flex justify-between mb-4 gap-2">
               <div className="flex-1 bg-white rounded-lg p-3 shadow-sm flex items-center justify-center">
                 <div className="flex items-center">
@@ -117,23 +116,30 @@ export default function Home() {
                   <div className="w-6 h-6 rounded-full bg-teal-100 flex items-center justify-center mr-2">
                     <span className="text-xs text-teal-500">👤</span>
                   </div>
-                  <span className="text-sm truncate">{address ? `${address.slice(0, 6)}...${address.slice(-4)}` : ''}</span>
+                  <span className="text-sm truncate">
+                    {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : ''}
+                  </span>
                 </div>
               </div>
             </div>
 
-            {/* コンテンツ表示（タブに応じて切り替え） */}
+            {/* トークンリスト or NFT表示 */}
             {activeTab === 'wallet' ? (
               <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                <TokenList onSelectToken={handleSelectToken} onUpdateTotalBalance={updateTotalBalance} />
+                <TokenList
+                  onSelectToken={handleSelectToken}
+                  onUpdateTotalBalance={updateTotalBalance}
+                />
               </div>
             ) : (
               <div className="bg-white rounded-lg shadow-sm p-4">
                 <h2 className="text-xl font-bold mb-4">Game Tokens</h2>
                 <div className="grid grid-cols-2 gap-4">
-                  {/* NFTのプレースホルダー */}
                   {[1, 2, 3, 4].map((item) => (
-                    <div key={item} className="aspect-square bg-gray-200 rounded-lg flex items-center justify-center">
+                    <div
+                      key={item}
+                      className="aspect-square bg-gray-200 rounded-lg flex items-center justify-center"
+                    >
                       <p className="text-gray-500">NFT {item}</p>
                     </div>
                   ))}
