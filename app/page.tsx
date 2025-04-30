@@ -59,7 +59,7 @@ export default function Home() {
         {/* ウォレット接続 */}
         {!isConnected ? (
           <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm mt-4">
-            <h3 className="text-sm font-semibold bg-gray-100 p-2 text-center">5:Connect your wallet</h3>
+            <h3 className="text-sm font-semibold bg-gray-100 p-2 text-center">6:Connect your wallet</h3>
             <div className="flex justify-center items-center p-4">
               <appkit-button />
             </div>
