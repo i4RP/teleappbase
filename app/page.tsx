@@ -58,7 +58,7 @@ export default function Home() {
         {/* 常に表示するウォレットボタン */}
         <div className="flex flex-col items-center mt-4">
         <appkit-button />
-        <span className="text-xs text-gray-400 mt-1">ver 7</span>
+        <span className="text-xs text-gray-400 mt-1">ver 8 SEPOLIA</span>
         </div>
 
 
