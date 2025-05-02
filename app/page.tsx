@@ -9,6 +9,7 @@ import SendModal from "@/components/SendModal";
 import Image from "next/image";
 import { sepolia } from "viem/chains";
 import { Address } from "viem";
+import { config } from '@/config';
 
 interface Token {
   symbol: string;
@@ -22,14 +23,16 @@ interface Token {
 
 type TabType = 'wallet' | 'gameToken';
 
-const GAME_COIN_ADDRESS: Address = "0xYourGameCoinAddress"; // ← 実アドレスに置き換えてください
+// ← 実アドレスに置き換えてください
+const GAME_COIN_ADDRESS: Address = "0xc0bA78DBBDBE453B4A1B9c810A1617F853aD4e0A";
+
 const GAME_COIN_ABI = [
   {
     type: "function",
     name: "gameCoinBalance",
     stateMutability: "view",
-    inputs: [{ name: "account", type: "address" }],
-    outputs: [{ name: "balance", type: "uint256" }]
+    inputs: [{ name: "account", type: "address", internalType: "address" }],
+    outputs: [{ name: "balance", type: "uint256", internalType: "uint256" }]
   }
 ];
 
@@ -49,12 +52,12 @@ export default function Home() {
   const fetchGameCoinBalance = async () => {
     if (!chainId || chainId !== sepolia.id) return;
     try {
-      const raw = await readContract({
+      const raw = await readContract(config, {
         address: GAME_COIN_ADDRESS,
         abi: GAME_COIN_ABI,
         functionName: 'gameCoinBalance',
         args: [effectiveAddress],
-        chainId, // ← useChainId() から取得した値
+        chainId, // 明示的に指定（オプション）
       });
       setGameCoinBalance(String(raw));
     } catch (err) {
