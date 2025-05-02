@@ -1,14 +1,12 @@
 "use client";
-export const runtime = 'edge'
+export const runtime = 'edge';
 
 import { useState, useEffect } from "react";
-import { useAccount, useChainId, useSwitchChain, useContractRead } from "wagmi";
+import { useAccount, useChainId, useSwitchChain, readContract } from "wagmi";
 import TokenList from "@/components/TokenList";
 import SendModal from "@/components/SendModal";
-import GameCoinActions from "../components/GameCoinActions";
 import Image from "next/image";
 import { sepolia } from "viem/chains";
-import { GAME_COIN_ADDRESS, gameCoinABI, formatGameCoinBalance } from "@/contracts/GameCoin";
 import { Address } from "viem";
 
 interface Token {
@@ -23,29 +21,53 @@ interface Token {
 
 type TabType = 'wallet' | 'gameToken';
 
+const GAME_COIN_ADDRESS: Address = "0xYourGameCoinAddress"; // ← 実アドレスに置き換えてください
+const GAME_COIN_ABI = [
+  {
+    type: "function",
+    name: "gameCoinBalance",
+    stateMutability: "view",
+    inputs: [{ name: "account", type: "address" }],
+    outputs: [{ name: "balance", type: "uint256" }]
+  }
+];
+
 export default function Home() {
   const { isConnected, address } = useAccount();
   const chainId = useChainId();
   const { switchChain } = useSwitchChain();
+
   const [selectedToken, setSelectedToken] = useState<Token | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('wallet');
   const [totalWalletBalance, setTotalWalletBalance] = useState<string>("0.00");
-  const [gameCoinBalance, setGameCoinBalance] = useState<string>("0.00");
-  const [prNumber, setPrNumber] = useState<string>("18");
+  const [gameCoinBalance, setGameCoinBalance] = useState<string>("0");
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
-  const handleSelectToken = (token: Token) => setSelectedToken(token);
-  const closeModal = () => setSelectedToken(null);
-  const handleTabChange = (tab: TabType) => setActiveTab(tab);
-  const updateTotalBalance = (total: string) => setTotalWalletBalance(total);
+  const fallbackAddress: Address = '0x40deA50302F41b7B695135b588B1ce2b5834Ccd3';
+  const effectiveAddress: Address = (address || fallbackAddress) as Address;
+
+  const fetchGameCoinBalance = async () => {
+    if (!chainId || chainId !== sepolia.id) return;
+    try {
+      const raw = await readContract({
+        address: GAME_COIN_ADDRESS,
+        abi: GAME_COIN_ABI,
+        functionName: 'gameCoinBalance',
+        args: [effectiveAddress],
+        chainId: sepolia.id,
+      });
+      setGameCoinBalance(String(raw));
+    } catch (err) {
+      console.error("GameCoin取得失敗:", err);
+      setGameCoinBalance("0");
+    }
+  };
 
   useEffect(() => {
-    if (isConnected && address) {
+    if (isConnected) {
       console.log("ウォレット接続済み:", address);
-      setIsInitialized(true);
-    } else {
-      setIsInitialized(true);
     }
+    setIsInitialized(true);
   }, [isConnected, address]);
 
   useEffect(() => {
@@ -55,29 +77,18 @@ export default function Home() {
     };
   }, [selectedToken]);
 
-  const { data: gameCoinBalanceData } = useContractRead({
-    address: GAME_COIN_ADDRESS,
-    abi: gameCoinABI,
-    functionName: 'gameCoinBalance',
-    args: address ? [address as Address] : undefined,
-    chainId: sepolia.id,
-    query: {
-      enabled: isConnected && !!address && chainId === sepolia.id && activeTab === 'gameToken',
-    },
-  });
+  useEffect(() => {
+    fetchGameCoinBalance();
+  }, [address, chainId]);
 
   useEffect(() => {
-    if (gameCoinBalanceData !== undefined) {
-      const formatted = formatGameCoinBalance(gameCoinBalanceData);
-      setGameCoinBalance(formatted);
+    if (activeTab === 'gameToken') {
+      if (chainId !== sepolia.id) {
+        switchChain({ chainId: sepolia.id });
+      }
+      fetchGameCoinBalance();
     }
-  }, [gameCoinBalanceData]);
-
-  useEffect(() => {
-    if (activeTab === 'gameToken' && chainId !== sepolia.id) {
-      switchChain({ chainId: sepolia.id });
-    }
-  }, [activeTab, chainId, switchChain]);
+  }, [activeTab]);
 
   if (!isInitialized) {
     return (
@@ -90,23 +101,20 @@ export default function Home() {
   return (
     <main className="min-h-screen px-4 py-0 pb-12 flex-1 flex flex-col items-center bg-gray-100">
       <div className="max-w-md w-full">
-        {/* ✅ 常に表示するウォレットボタン */}
         <div className="flex flex-col items-center mt-4">
           <appkit-button />
           <span className="text-xs text-gray-400 mt-1">ver 9 SEPOLIA</span>
         </div>
 
-        {/* ✅ ウォレット接続済みUI */}
         {isConnected && (
           <>
-            {/* タブUI */}
             <div className="mt-4 mb-4">
               <div className="flex rounded-lg overflow-hidden bg-gray-700">
                 <button
                   className={`flex-1 py-3 px-4 text-center font-medium ${
                     activeTab === 'wallet' ? 'bg-gray-600 text-white' : 'text-gray-300'
                   }`}
-                  onClick={() => handleTabChange('wallet')}
+                  onClick={() => setActiveTab('wallet')}
                 >
                   Wallet
                 </button>
@@ -114,34 +122,26 @@ export default function Home() {
                   className={`flex-1 py-3 px-4 text-center font-medium ${
                     activeTab === 'gameToken' ? 'bg-gray-600 text-white' : 'text-gray-300'
                   }`}
-                  onClick={() => handleTabChange('gameToken')}
+                  onClick={() => setActiveTab('gameToken')}
                 >
                   Game Token
                 </button>
               </div>
             </div>
 
-            {/* 残高表示 */}
             <div className="bg-white rounded-lg p-6 shadow-sm mb-4 text-center">
               <h2 className="text-lg text-gray-500 mb-2">
                 {activeTab === 'wallet' ? 'Wallet Balance' : 'BCM Balance'}
               </h2>
               <p className="text-3xl font-bold">
-                ${activeTab === 'wallet' ? totalWalletBalance : gameCoinBalance}
+                {activeTab === 'wallet' ? `$${totalWalletBalance}` : `${gameCoinBalance} BCM`}
               </p>
             </div>
 
-            {/* アドレスとネットワーク */}
             <div className="flex justify-between mb-4 gap-2">
               <div className="flex-1 bg-white rounded-lg p-3 shadow-sm flex items-center justify-center">
                 <div className="flex items-center">
-                  <Image
-                    src="/images/tokens/eth.png"
-                    alt="Ethereum"
-                    width={24}
-                    height={24}
-                    className="mr-2"
-                  />
+                  <Image src="/images/tokens/eth.png" alt="Ethereum" width={24} height={24} className="mr-2" />
                   <span>{chainId === sepolia.id ? 'Sepolia' : 'Ethereum'}</span>
                 </div>
               </div>
@@ -155,10 +155,9 @@ export default function Home() {
               </div>
             </div>
 
-            {/* コンテンツ切り替え */}
             {activeTab === 'wallet' ? (
               <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                <TokenList onSelectToken={handleSelectToken} onUpdateTotalBalance={updateTotalBalance} />
+                <TokenList onSelectToken={setSelectedToken} onUpdateTotalBalance={setTotalWalletBalance} />
               </div>
             ) : (
               <div className="bg-white rounded-lg shadow-sm p-4">
@@ -166,13 +165,13 @@ export default function Home() {
                   <>
                     <div className="mb-4 p-3 bg-green-100 text-green-800 rounded-lg flex items-center">
                       <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                       </svg>
                       <span>Sepoliaネットワークに接続されています</span>
                     </div>
                     <div className="mb-4 p-3 bg-blue-100 text-blue-800 rounded-lg flex items-center">
                       <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       <span>GameCoin残高: {gameCoinBalance} BCM</span>
                     </div>
@@ -195,7 +194,7 @@ export default function Home() {
                       <h3 className="font-bold">ネットワークエラー</h3>
                     </div>
                     <p>Game TokenはSepoliaテストネットでのみ利用可能です。ネットワークをSepoliaに切り替えてください。</p>
-                    <button 
+                    <button
                       onClick={() => switchChain({ chainId: sepolia.id })}
                       className="mt-3 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg font-medium"
                     >
@@ -209,10 +208,9 @@ export default function Home() {
         )}
       </div>
 
-      {/* モーダル */}
       {selectedToken && (
         <div className="fixed inset-0 z-50">
-          <SendModal token={selectedToken} onClose={closeModal} />
+          <SendModal token={selectedToken} onClose={() => setSelectedToken(null)} />
         </div>
       )}
     </main>
