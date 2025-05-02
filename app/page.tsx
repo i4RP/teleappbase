@@ -49,13 +49,15 @@ export default function Home() {
   const fetchGameCoinBalance = async () => {
     if (!chainId || chainId !== sepolia.id) return;
     try {
-      const raw = await readContract({
-        address: GAME_COIN_ADDRESS,
-        abi: GAME_COIN_ABI,
-        functionName: 'gameCoinBalance',
-        args: [effectiveAddress],
-        chainId, // ← useChainId() から取得した値
-      });
+      const raw = await readContract(
+        {
+          address: GAME_COIN_ADDRESS,
+          abi: GAME_COIN_ABI,
+          functionName: 'gameCoinBalance',
+          args: [effectiveAddress],
+        },
+        { chainId } // ← 2番目の引数としてconfigオブジェクトを渡す
+      );
       setGameCoinBalance(String(raw));
     } catch (err) {
       console.error("GameCoin取得失敗:", err);
