@@ -9,6 +9,7 @@ import SendModal from "@/components/SendModal";
 import Image from "next/image";
 import { sepolia } from "viem/chains";
 import { Address } from "viem";
+import { config } from "@/config";
 
 interface Token {
   symbol: string;
@@ -49,13 +50,16 @@ export default function Home() {
   const fetchGameCoinBalance = async () => {
     if (!chainId || chainId !== sepolia.id) return;
     try {
-      const raw = await readContract({
-        address: GAME_COIN_ADDRESS,
-        abi: GAME_COIN_ABI,
-        functionName: 'gameCoinBalance',
-        args: [effectiveAddress],
-        chainId, // ← useChainId() から取得した値
-      });
+      const raw = await readContract(
+        config,
+        {
+          abi: GAME_COIN_ABI,
+          address: GAME_COIN_ADDRESS,
+          functionName: 'gameCoinBalance',
+          args: [effectiveAddress],
+          chainId
+        }
+      );
       setGameCoinBalance(String(raw));
     } catch (err) {
       console.error("GameCoin取得失敗:", err);
