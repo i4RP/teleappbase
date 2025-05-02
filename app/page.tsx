@@ -2,7 +2,9 @@
 export const runtime = 'edge';
 
 import { useState, useEffect } from "react";
-import { useAccount, useChainId, useSwitchChain, readContract } from "wagmi";
+import { useAccount, useChainId, useSwitchChain } from "wagmi";
+import { readContract } from "wagmi/actions";
+
 import TokenList from "@/components/TokenList";
 import SendModal from "@/components/SendModal";
 import Image from "next/image";
@@ -54,7 +56,7 @@ export default function Home() {
         abi: GAME_COIN_ABI,
         functionName: 'gameCoinBalance',
         args: [effectiveAddress],
-        chainId: sepolia.id,
+        chainId,
       });
       setGameCoinBalance(String(raw));
     } catch (err) {
