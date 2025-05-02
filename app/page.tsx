@@ -56,7 +56,8 @@ export default function Home() {
           abi: GAME_COIN_ABI,
           address: GAME_COIN_ADDRESS,
           functionName: 'gameCoinBalance',
-          args: [effectiveAddress]
+          args: [effectiveAddress],
+          chainId
         }
       );
       setGameCoinBalance(String(raw));
