@@ -2,9 +2,8 @@
 export const runtime = 'edge';
 
 import { useState, useEffect } from "react";
-import { useAccount, useChainId, useSwitchChain } from "wagmi";
-import { readContract } from "wagmi/actions";
-
+import { useAccount, useChainId } from "wagmi";
+import { getClient, readContract } from "wagmi/actions";
 import TokenList from "@/components/TokenList";
 import SendModal from "@/components/SendModal";
 import Image from "next/image";
@@ -37,7 +36,6 @@ const GAME_COIN_ABI = [
 export default function Home() {
   const { isConnected, address } = useAccount();
   const chainId = useChainId();
-  const { switchChain } = useSwitchChain();
 
   const [selectedToken, setSelectedToken] = useState<Token | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('wallet');
@@ -51,13 +49,16 @@ export default function Home() {
   const fetchGameCoinBalance = async () => {
     if (!chainId || chainId !== sepolia.id) return;
     try {
-      const raw = await readContract({
-        address: GAME_COIN_ADDRESS,
-        abi: GAME_COIN_ABI,
-        functionName: 'gameCoinBalance',
-        args: [effectiveAddress],
-        chainId,
-      });
+      const raw = await readContract(
+        getClient(),
+        {
+          address: GAME_COIN_ADDRESS,
+          abi: GAME_COIN_ABI,
+          functionName: 'gameCoinBalance',
+          args: [effectiveAddress],
+          chainId,
+        }
+      );
       setGameCoinBalance(String(raw));
     } catch (err) {
       console.error("GameCoin取得失敗:", err);
@@ -85,9 +86,6 @@ export default function Home() {
 
   useEffect(() => {
     if (activeTab === 'gameToken') {
-      if (chainId !== sepolia.id) {
-        switchChain({ chainId: sepolia.id });
-      }
       fetchGameCoinBalance();
     }
   }, [activeTab]);
@@ -163,47 +161,27 @@ export default function Home() {
               </div>
             ) : (
               <div className="bg-white rounded-lg shadow-sm p-4">
-                {chainId === sepolia.id ? (
-                  <>
-                    <div className="mb-4 p-3 bg-green-100 text-green-800 rounded-lg flex items-center">
-                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span>Sepoliaネットワークに接続されています</span>
+                <div className="mb-4 p-3 bg-green-100 text-green-800 rounded-lg flex items-center">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Sepoliaネットワークに接続されています</span>
+                </div>
+                <div className="mb-4 p-3 bg-blue-100 text-blue-800 rounded-lg flex items-center">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>GameCoin残高: {gameCoinBalance} BCM</span>
+                </div>
+                <h2 className="text-xl font-bold mb-4">Game Tokens</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  {[1, 2, 3, 4].map((item) => (
+                    <div key={item} className="aspect-square bg-gray-200 rounded-lg flex items-center justify-center">
+                      <p className="text-gray-500">NFT {item}</p>
                     </div>
-                    <div className="mb-4 p-3 bg-blue-100 text-blue-800 rounded-lg flex items-center">
-                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span>GameCoin残高: {gameCoinBalance} BCM</span>
-                    </div>
-                    <h2 className="text-xl font-bold mb-4">Game Tokens</h2>
-                    <div className="grid grid-cols-2 gap-4">
-                      {[1, 2, 3, 4].map((item) => (
-                        <div key={item} className="aspect-square bg-gray-200 rounded-lg flex items-center justify-center">
-                          <p className="text-gray-500">NFT {item}</p>
-                        </div>
-                      ))}
-                    </div>
-                    <p className="text-center text-gray-500 mt-4">NFTデータは後ほど実装予定</p>
-                  </>
-                ) : (
-                  <div className="p-4 bg-yellow-100 text-yellow-800 rounded-lg">
-                    <div className="flex items-center mb-2">
-                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01M5 20h14c1.5 0 2.5-1.5 1.5-3L13.5 4c-.9-1.5-3.1-1.5-4 0L3.5 17c-1 1.5 0 3 1.5 3z" />
-                      </svg>
-                      <h3 className="font-bold">ネットワークエラー</h3>
-                    </div>
-                    <p>Game TokenはSepoliaテストネットでのみ利用可能です。ネットワークをSepoliaに切り替えてください。</p>
-                    <button
-                      onClick={() => switchChain({ chainId: sepolia.id })}
-                      className="mt-3 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg font-medium"
-                    >
-                      Sepoliaに切り替える
-                    </button>
-                  </div>
-                )}
+                  ))}
+                </div>
+                <p className="text-center text-gray-500 mt-4">NFTデータは後ほど実装予定</p>
               </div>
             )}
           </>
