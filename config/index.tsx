@@ -13,10 +13,34 @@ if (!projectId) {
 export const networks = [sepolia, mainnet, arbitrum, scroll, morph, berachainTestnetbArtio, mantle, soneium, zircuit, rootstock, abstract, viction, monadTestnet, celo, apeChain]
 
 //Set up the Wagmi Adapter (Config)
+const combinedStorage = createStorage({
+  storage: {
+    getItem: (key) => {
+      const cookieValue = cookieStorage.getItem(key);
+      if (cookieValue !== null) return cookieValue;
+
+      if (typeof window !== 'undefined') {
+        return localStorage.getItem(key);
+      }
+      return null;
+    },
+    setItem: (key, value) => {
+      cookieStorage.setItem(key, value);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(key, value);
+      }
+    },
+    removeItem: (key) => {
+      cookieStorage.removeItem(key);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(key);
+      }
+    },
+  },
+})
+
 export const wagmiAdapter = new WagmiAdapter({
-  storage: createStorage({
-    storage: cookieStorage
-  }),
+  storage: combinedStorage,
   ssr: true,
   networks,
   projectId
