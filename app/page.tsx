@@ -3,7 +3,7 @@ export const runtime = 'edge';
 
 import { useState, useEffect } from "react";
 import { useAccount, useChainId } from "wagmi";
-import { getClient, readContract } from "wagmi/actions";
+import { useReadContract } from 'wagmi'
 import TokenList from "@/components/TokenList";
 import SendModal from "@/components/SendModal";
 import Image from "next/image";
@@ -49,16 +49,13 @@ export default function Home() {
   const fetchGameCoinBalance = async () => {
     if (!chainId || chainId !== sepolia.id) return;
     try {
-      const raw = await readContract(
-        getClient(),
-        {
-          address: GAME_COIN_ADDRESS,
-          abi: GAME_COIN_ABI,
-          functionName: 'gameCoinBalance',
-          args: [effectiveAddress],
-          chainId,
-        }
-      );
+      const raw = await useReadContract({
+        address: GAME_COIN_ADDRESS,
+        abi: GAME_COIN_ABI,
+        functionName: 'gameCoinBalance',
+        args: [effectiveAddress],
+        chainId: sepolia.id,
+      });
       setGameCoinBalance(String(raw));
     } catch (err) {
       console.error("GameCoin取得失敗:", err);
